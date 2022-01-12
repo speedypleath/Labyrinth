@@ -5,6 +5,7 @@
 #include <Shader.h>
 #include <Camera.h>
 #include <Maze.h>
+#include <Renderer.h>
 #include <errorHandle.h>
 #include "glm/glm.hpp"  
 #include "glm/gtc/matrix_transform.hpp"
@@ -14,20 +15,16 @@
 
 class Scene {
 private:
-    VAO *vao;
-    VAO *vao2;
-    VBO *positionVBO;
-    VBO *colorVBO;
-    VBO *instanceVBO;
-    EBO *ebo;
-    Shader *shader;
     Camera *camera;
-    GLuint instanceCount;
     static Scene *instance;
     Maze *maze;
     glm::mat4 projectionMatrix;
     glm::mat4 viewMatrix;
     glm::mat4 modelMatrix;
+    Renderer *verticalWallRenderer;
+    Renderer *horizontalWallRenderer;
+    Renderer *floorRenderer;
+    Renderer *cornerRenderer;
 public:
     Scene();
     ~Scene();

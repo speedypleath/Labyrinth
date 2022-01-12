@@ -1,5 +1,6 @@
 #include "Shader.h"
 
+#include <stdlib.h>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -81,6 +82,11 @@ GLuint Shader::loadShaders(const char *vertex_path, const char *fragment_path) {
     std::vector<char> programError( (logLength > 1) ? logLength : 1 );
     GLCall(glGetProgramInfoLog(program, logLength, NULL, &programError[0]));
     std::cout << &programError[0] << std::endl;
+    if(logLength > 0) {
+        std::cout << "Vertex shader compilation failed." << std::endl;
+        raise(SIGTRAP);
+        exit(0);
+    }
 
     GLCall(glDeleteShader(vertShader));
     GLCall(glDeleteShader(fragShader));

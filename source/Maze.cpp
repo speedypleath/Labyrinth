@@ -58,35 +58,15 @@ Maze::~Maze()
     delete[] horizontalWalls;
 }
 
-int Maze::countVerticalWalls(){
+int Maze::countBlocks(){
     int count = 0;
-    for (int i = 0; i < width; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            if (verticalWalls[i][j] == 1)
-            {
+    for(int i = 0; i < width + 1; i++)
+        for(int j = 0; j < 2 * width + 1; j++)
+            if(maze[i][j] == '_' || maze[i][j] == '|')
                 count++;
-            }
-        }
-    }
     return count;
 }
 
-int Maze::countHorizontalWalls(){
-    int count = 0;
-    for (int i = 0; i < width; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            if (horizontalWalls[i][j] == 1)
-            {
-                count++;
-            }
-        }
-    }
-    return count;
-}
 
 int Maze::adjency(int dir[], int x, int y)
 {
@@ -158,7 +138,7 @@ void Maze::create()
         }
     }
     
-    for (i = 1; i < width; i++)
+    for (i = 0; i < width - 1; i++)
     {
         this->maze[k / n][k++ % n] = '|';
 

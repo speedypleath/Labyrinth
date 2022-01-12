@@ -6,6 +6,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include <Renderer.h>
 
 Scene::Scene() { }
 Scene::~Scene() { }
@@ -40,12 +41,13 @@ void Scene::cleanupWrapper() {
 
 void Scene::start(int *argc, char **argv) {
     // set the display mode
-    glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_SINGLE|GLUT_RGB);
+    glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_SINGLE| GLUT_RGB | GLUT_DEPTH);
     // initialize glut
     glutInit(argc, argv);
     // create the window
+    glutInitWindowSize(800, 600);
     glutCreateWindow("Labyrinth"); 
-    glutFullScreen(); 
+    // glutFullScreen(); 
     // initialize the program 
     this->init();
     // set the display function
@@ -73,15 +75,16 @@ void Scene::init(void)
     const GLfloat PI = 3.141592;
     // set the background color white
     GLCall(glClearColor(1.0f, 1.0f, 1.0f, 0.0f));
-    maze = new Maze(7);
+    int mazeSize = 8;
+    maze = new Maze(mazeSize);
     maze->generate(0, 0);
     maze->create();
     maze->print();
-    instanceCount = maze->countVerticalWalls() + maze->countHorizontalWalls();
     int **verticalWalls = maze->getVerticalWalls();
     int **horizontalWalls = maze->getHorizontalWalls();
+    char **mazeMap = maze->getMaze();
     // create a cube
-    GLfloat Vertices[] =
+    GLfloat wall[] =
 	{
 		// punctele din planul z=-50   coordonate                   		
 		-100.0f,  -50.0f, 0.0f, 1.0f,
@@ -93,6 +96,20 @@ void Scene::init(void)
 		100.0f,  -50.0f,  70.0f, 1.0f,
 		100.0f,  50.0f,  70.0f, 1.0f,
 		-100.0f,  50.0f, 70.0f, 1.0f,
+    };
+
+    GLfloat verticalWall[] =
+	{
+		// punctele din planul z=-50   coordonate                   		
+		0.0f,  -50.0f, 200.0f, 1.0f,
+		0.0f,  -50.0f,  0.0f, 1.0f,
+		0.0f,  50.0f,  0.0f, 1.0f,
+		0.0f,  50.0f, 200.0f, 1.0f,
+		// punctele din planul z=+50  coordonate                   		
+		100.0f,  -50.0f, 0.0f, 1.0f,
+		100.0f,  -50.0f,  200.0f, 1.0f,
+		100.0f,  50.0f,  200.0f, 1.0f,
+		100.0f,  50.0f, 0.0f, 1.0f,
     };
 
 	// indicii pentru varfuri
@@ -112,49 +129,10 @@ void Scene::init(void)
 	  3, 7
 	};
 
-    	// Culorile instantelor
-	glm::vec4 Colors[instanceCount];
-	for (int n = 0; n < instanceCount; n++)
-	{
-		float a = float(n) / 4.0f;
-		float b = float(n) / 5.0f;
-		float c = float(n) / 6.0f;
-		Colors[n][0] = 0.35f + 0.30f * (sinf(a + 2.0f) + 1.0f);
-		Colors[n][1] = 0.25f + 0.25f * (sinf(b + 3.0f) + 1.0f);
-		Colors[n][2] = 0.25f + 0.35f * (sinf(c + 4.0f) + 1.0f);
-		Colors[n][3] = 1.0f;
-	}
-    // for (int n = 0; n < maze->countVerticalWalls(); n++)
-    //     Colors[n] = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    
-    // for (int n = 0; n < maze->countHorizontalWalls(); n++)
-    //     Colors[n + maze->countVerticalWalls()] = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-
-    int n = 0;
-	glm::mat4 MatModel[instanceCount];
-
-    // for(int i = 0; i < 7; i++)
-    //     MatModel[n++] = glm::translate(glm::mat4(1.0f), glm::vec3(200 * i, 0.0, 200 * j));
-    for (int i = 0; i < 7; i++)
-	    for (int j = 0; j < 7; j++)
-            if(verticalWalls[i][j] == 1)
-		        MatModel[n++] = glm::translate(glm::mat4(1.0f), glm::vec3(200 * i, 0.0, 200 * j));
-
-    for (int i = 0; i < 7; i++)
-	    for (int j = 0; j < 7; j++)
-            if(horizontalWalls[i][j] == 1)
-                MatModel[n++] =  glm::translate(glm::mat4(1.0f), glm::vec3(200 * i, 0.0, 200 * j)) * glm::rotate(glm::mat4(1.0f), PI / 2.0f, glm::vec3(0.0, 1.0, 0.0));
-    // position vbo
-    vao = new VAO();
-    ebo = new EBO(Indices, sizeof(Indices) / sizeof(GLuint));
-    positionVBO = new VBO(Vertices, sizeof(Vertices));
-    colorVBO = new VBO(Colors, sizeof(Colors));
-    instanceVBO = new VBO(MatModel, sizeof(MatModel));
-    shader = new Shader("resource/shader.vert", "resource/shader.frag");
-    vao->addBufferVec4(*positionVBO, false);
-    vao->addBufferVec4(*colorVBO, true);
-    vao->addBufferMat4(*instanceVBO);
-
+    verticalWallRenderer = new Renderer(wall, Indices, sizeof(wall), sizeof(Indices) / sizeof(GLuint));
+    verticalWallRenderer->instance(horizontalWalls, mazeSize, mazeSize, glm::mat4(1.0f));
+    horizontalWallRenderer = new Renderer(wall, Indices, sizeof(wall), sizeof(Indices) / sizeof(GLuint));
+    horizontalWallRenderer->instance(verticalWalls, mazeSize, mazeSize, glm::rotate(glm::mat4(1.0f), glm::pi<float>() / 2.0f, glm::vec3(0.0, 1.0, 0.0)));
     camera = new Camera(glm::vec3(-100.0f, 0.0f, 350.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), verticalWalls, horizontalWalls);
     projectionMatrix = glm::infinitePerspective(PI / 2.0f, GLfloat(800.0f) / GLfloat(600.0f), 1.0f);
 }
@@ -162,16 +140,26 @@ void Scene::init(void)
 // render the program
 void Scene::render(void)
 {  
+    
     GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 	GLCall(glEnable(GL_DEPTH_TEST));
     viewMatrix = camera->getViewMatrix();
-    // glEnable(GL_BLEND);  // enable blending
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    int codCol = 0;
-    shader->setInt("codCol", codCol);
-    shader->setMat4("viewMatrix", viewMatrix);
-    shader->setMat4("projectionMatrix", projectionMatrix);
-	GLCall(glDrawElementsInstancedARB(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, instanceCount));
+    projectionMatrix = glm::infinitePerspective(glm::pi<float>() / 2.0f, GLfloat(800.0f) / GLfloat(600.0f), 1.0f) * glm::rotate(glm::mat4(1.0f), glm::pi<float>() / 2.0f, glm::vec3(0.0, 1.0, 0.0)) 
+                * glm::translate(glm::mat4(1.0f), glm::vec3(-100.0, 0.0, 30.0));
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glAlphaFunc (GL_GREATER, 0.1);
+    glEnable(GL_ALPHA_TEST);
+
+    // int codCol = 0;
+    // shader->setInt("codCol", codCol);
+    // shader->setMat4("viewMatrix", viewMatrix);
+    // shader->setMat4("projectionMatrix", projectionMatrix);
+
+    
+    verticalWallRenderer->drawInstanced(viewMatrix, projectionMatrix);
+    horizontalWallRenderer->drawInstanced(viewMatrix, projectionMatrix);
+	// GLCall(glDrawElementsInstanced(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0, instanceCount));
 
     GLCall(glutSwapBuffers());
     GLCall(glFlush());
@@ -235,11 +223,7 @@ void Scene::processMouseMovement(int x, int y)
 // cleanup the program
 void Scene::cleanup(void)
 {
-    delete vao;
-    delete positionVBO;
-    delete colorVBO;
-    delete instanceVBO;
-    delete shader;
-    delete ebo;
     delete camera;
+    delete verticalWallRenderer;
+    delete horizontalWallRenderer;
 }

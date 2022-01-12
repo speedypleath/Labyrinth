@@ -15,10 +15,10 @@ public:
     ~Maze();
     void generate(int x, int y);
     int adjency(int dir[], int x, int y);
-    int countVerticalWalls();
-    int countHorizontalWalls();
+    int countBlocks();
     int **getVerticalWalls() const { return verticalWalls; }
     int **getHorizontalWalls() const { return horizontalWalls; }
+    char **getMaze() const { return maze; }
     void create();
     void print();
 };

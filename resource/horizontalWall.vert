@@ -12,6 +12,11 @@ uniform mat4 projectionMatrix;
  
 void main(void)
 {
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * in_Position;
+    gl_Position = projectionMatrix 
+    * viewMatrix 
+    * modelMatrix 
+    * rotate(mat4(1.0f), 3.14f / 2.0f, vec3(0.0, 1.0, 0.0)) 
+    * translate(mat4(1.0f), vec3(-100.0, 0.0, 30.0)) 
+    * in_Position;
 	ex_Color=in_Color;
 } 
