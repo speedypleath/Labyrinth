@@ -69,12 +69,13 @@ void Scene::start(int *argc, char **argv) {
 // initialize the program
 void Scene::init(void)
 {
-    glutSetCursor(GLUT_CURSOR_NONE);
+    GLCall(glutSetCursor(GLUT_CURSOR_NONE));
     const GLfloat PI = 3.141592;
     // set the background color white
     GLCall(glClearColor(1.0f, 1.0f, 1.0f, 0.0f));
     maze = new Maze(7);
     maze->generate(0, 0);
+    maze->create();
     maze->print();
     instanceCount = maze->countVerticalWalls() + maze->countHorizontalWalls();
     int **verticalWalls = maze->getVerticalWalls();
@@ -83,15 +84,15 @@ void Scene::init(void)
     GLfloat Vertices[] =
 	{
 		// punctele din planul z=-50   coordonate                   		
-		0.0f,  -50.0f, 0.0f, 1.0f,
-		200.0f,  -50.0f,  0.0f, 1.0f,
-		200.0f,  50.0f,  0.0f, 1.0f,
-		0.0f,  50.0f, 0.0f, 1.0f,
+		-100.0f,  -50.0f, 0.0f, 1.0f,
+		100.0f,  -50.0f,  0.0f, 1.0f,
+		100.0f,  50.0f,  0.0f, 1.0f,
+		-100.0f,  50.0f, 0.0f, 1.0f,
 		// punctele din planul z=+50  coordonate                   		
-		0.0f,  -50.0f, 30.0f, 1.0f,
-		200.0f,  -50.0f,  30.0f, 1.0f,
-		200.0f,  50.0f,  30.0f, 1.0f,
-		0.0f,  50.0f, 30.0f, 1.0f,
+		-100.0f,  -50.0f, 70.0f, 1.0f,
+		100.0f,  -50.0f,  70.0f, 1.0f,
+		100.0f,  50.0f,  70.0f, 1.0f,
+		-100.0f,  50.0f, 70.0f, 1.0f,
     };
 
 	// indicii pentru varfuri
@@ -131,6 +132,9 @@ void Scene::init(void)
 
     int n = 0;
 	glm::mat4 MatModel[instanceCount];
+
+    // for(int i = 0; i < 7; i++)
+    //     MatModel[n++] = glm::translate(glm::mat4(1.0f), glm::vec3(200 * i, 0.0, 200 * j));
     for (int i = 0; i < 7; i++)
 	    for (int j = 0; j < 7; j++)
             if(verticalWalls[i][j] == 1)
@@ -151,7 +155,7 @@ void Scene::init(void)
     vao->addBufferVec4(*colorVBO, true);
     vao->addBufferMat4(*instanceVBO);
 
-    camera = new Camera(glm::vec3(-50.0f, 0.0f, -50.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), verticalWalls, horizontalWalls);
+    camera = new Camera(glm::vec3(-100.0f, 0.0f, 350.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), verticalWalls, horizontalWalls);
     projectionMatrix = glm::infinitePerspective(PI / 2.0f, GLfloat(800.0f) / GLfloat(600.0f), 1.0f);
 }
 
@@ -179,6 +183,7 @@ void Scene::render(void)
 // process normal keys
 void Scene::processNormalKeys(unsigned char key, int x, int y)
 {
+    maze->print();
     if(key == 'w')
     {
         camera->processKeyboard(UP, 8.0f);

@@ -7,6 +7,8 @@ private:
     int **visited;
     int **verticalWalls;
     int **horizontalWalls;
+    char **maze;
+    int gate;
 
 public:
     Maze(int width);
@@ -17,5 +19,6 @@ public:
     int countHorizontalWalls();
     int **getVerticalWalls() const { return verticalWalls; }
     int **getHorizontalWalls() const { return horizontalWalls; }
+    void create();
     void print();
 };

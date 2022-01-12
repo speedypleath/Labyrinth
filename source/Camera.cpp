@@ -91,6 +91,7 @@ void Camera::processKeyboard(direction direction, float deltaTime) {
 }
 
 void Camera::processMouseMovement(float xoffset, float yoffset) {
+    std :: cout << "xoffset: " << xoffset << " yoffset: " << yoffset << std::endl;
     if(xoffset <= 30.0)
         this->yaw += 1.0f;
 

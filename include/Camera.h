@@ -19,8 +19,6 @@ private:
     glm::quat orientation;
     int **verticalWalls;
     int **horizontalWalls;
-    float xMin;
-    float xMax;
     float lastX;
     float lastY;
     float yaw;

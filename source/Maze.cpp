@@ -16,20 +16,27 @@ enum
 
 Maze::Maze(int width)
 {
+    this->gate = rand() % (width - 2) + 1;
     srand(time(NULL));
     this->width = width;
     visited = new int *[width];
-    verticalWalls = new int *[width - 1];
+    verticalWalls = new int *[width];
     horizontalWalls = new int *[width];
+    maze = new char *[width + 1];
     for (int i = 0; i < width; i++)
     {
         visited[i] = new int[width];
         verticalWalls[i] = new int[width];
-        horizontalWalls[i] = new int[width - 1];
+        horizontalWalls[i] = new int[width];
         for (int j = 0; j < width; j++)
         {
             visited[i][j] = 0;
         }
+    }
+
+    for (int i = 0; i < width + 1; i++)
+    {
+        maze[i] = new char[2 * width + 1];
     }
 }
 
@@ -41,6 +48,11 @@ Maze::~Maze()
         delete[] verticalWalls[i];
         delete[] horizontalWalls[i];
     }
+    for (int i = 0; i < width + 1; i++)
+    {
+        delete[] maze[i];
+    }
+    delete[] maze;
     delete[] visited;
     delete[] verticalWalls;
     delete[] horizontalWalls;
@@ -128,56 +140,60 @@ void Maze::generate(int x, int y)
     }
 }
 
-void Maze::print()
+void Maze::create()
 {
-    // print horizontal walls
-    printf("Horizontal Walls:\n");
-    for (int i = 0; i < width; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            if (horizontalWalls[i][j] == 1)
-                printf("1");
-            else
-                printf("0");
-        }
-        printf("\n");
-    }
+    int i, j, k = 0, n = 2 * width + 1;
 
-    // print vertical walls
-    printf("Vertical Walls:\n");
-    for (int i = 0; i < width; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            if (verticalWalls[i][j] == 1)
-                printf("1");
-            else
-                printf("0");
-        }
-        printf("\n");
-    }
-
-    int i, j;
+    this->maze[k / n][k++ % n] = '_';
 
     for (i = 0; i < width; i++)
     {
-        putchar('_');
-        putchar('_');
+        if(i == gate){
+            this->maze[k / n][k++ % n] = ' ';
+            this->maze[k / n][k++ % n] = ' ';
+        }
+        else{
+            this->maze[k / n][k++ % n] = '_';
+            this->maze[k / n][k++ % n] = '_';
+        }
+    }
+    
+    for (i = 1; i < width; i++)
+    {
+        this->maze[k / n][k++ % n] = '|';
+
+        for (j = 0; j < width; j++)
+        {
+            if(i < width - 1 && verticalWalls[i][j])
+                this->maze[k / n][k++ % n] = ' ';
+            else
+                this->maze[k / n][k++ % n] = '_';
+            
+            if(j < width - 1 && horizontalWalls[i][j])
+                this->maze[k / n][k++ % n] = ' ';
+            else 
+                this->maze[k / n][k++ % n] = '|';
+        }
     }
 
-    putchar('\n');
+    this->maze[k / n][k++ % n] = '|';
 
-    for (j = 0; j < width; j++)
+    for (i = 0; i < width - 1; i++)
     {
-        putchar('|');
+        this->maze[k / n][k++ % n] = '_';
+        this->maze[k / n][k++ % n] = '_';
+    }
 
-        for (i = 0; i < width; i++)
-        {
-            putchar(j < width - 1 && verticalWalls[j][i] ? ' ' : '_');
-            putchar(i < width - 1 && horizontalWalls[j][i] ? ' ' : '|');
+    this->maze[k / n][k++ % n] = '_';
+    this->maze[k / n][k++ % n] = '|';
+
+}
+
+void Maze::print(){
+    for(int i = 0; i < width + 1; i++){
+        for(int j = 0; j < 2 * width + 1; j++){
+            std::cout << maze[i][j];
         }
-
-        putchar('\n');
+        std::cout << std::endl;
     }
 }
