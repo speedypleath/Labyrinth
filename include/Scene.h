@@ -25,6 +25,7 @@ private:
     Renderer *horizontalWallRenderer;
     Renderer *floorRenderer;
     Renderer *cornerRenderer;
+    Renderer *cubeRenderer;
 public:
     Scene();
     ~Scene();

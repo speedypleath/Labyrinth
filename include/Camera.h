@@ -17,15 +17,13 @@ private:
     glm::vec3 right;
     glm::vec3 worldUp;
     glm::quat orientation;
-    int **verticalWalls;
-    int **horizontalWalls;
     float lastX;
     float lastY;
     float yaw;
     float pitch;
     void updateVectors();
 public:
-    Camera(glm::vec3 position, glm::vec3 front, glm::vec3 worldUp, int **verticalWalls, int **horizontalWalls);
+    Camera(glm::vec3 position, glm::vec3 front, glm::vec3 worldUp);
     ~Camera();
     glm::mat4 getViewMatrix();
     void processKeyboard(direction direction, float deltaTime);

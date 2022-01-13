@@ -2,12 +2,10 @@
 #include <iostream>
 #include <GLUT/glut.h>
 
-Camera::Camera(glm::vec3 position, glm::vec3 front, glm::vec3 worldUp, int **verticalWalls, int **horizontalWalls) {
+Camera::Camera(glm::vec3 position, glm::vec3 front, glm::vec3 worldUp) {
     this->position = position;
     this->front = front;
     this->worldUp = worldUp;
-    this->verticalWalls = verticalWalls;
-    this->horizontalWalls = horizontalWalls;
     this->lastX = 400.0f;
     this->lastY = 300.0f;
     this->yaw = -50.0f;
@@ -44,14 +42,14 @@ bool Camera::isCollision(glm::vec3 position) {
     }
     // std::cout<<"x: "<<x<<" z: "<<z<<" vertical: "<<verticalWalls[x][z]<<" horizontal: "<<horizontalWalls[x][z]<<std::endl;
     // std::cout<<"modX: "<<modX<<" modZ: "<<modZ<<std::endl;
-    bool insideVertical = (verticalWalls[x][z] == 1) && (modZ <= 30);
-    // std::cout<<"cond 1: "<<verticalWalls[x][z]<<" cond 2: "<< (modZ <= 30) <<std::endl;
-    bool insideHorizontal = (horizontalWalls[x][z] == 1) && (modX <= 30);
-    // std::cout<<"insideVertical: "<<insideVertical<<" insideHorizontal: "<<insideHorizontal<<std::endl;
-    if(insideHorizontal || insideVertical) {
-        std::cout<<"collision"<<std::endl;
-        // return true;
-    }
+    // bool insideVertical = (verticalWalls[x][z] == 1) && (modZ <= 30);
+    // // std::cout<<"cond 1: "<<verticalWalls[x][z]<<" cond 2: "<< (modZ <= 30) <<std::endl;
+    // bool insideHorizontal = (horizontalWalls[x][z] == 1) && (modX <= 30);
+    // // std::cout<<"insideVertical: "<<insideVertical<<" insideHorizontal: "<<insideHorizontal<<std::endl;
+    // if(insideHorizontal || insideVertical) {
+    //     std::cout<<"collision"<<std::endl;
+    //     // return true;
+    // }
     return false;
 }
 
@@ -61,9 +59,6 @@ void Camera::processKeyboard(direction direction, float deltaTime) {
     glm::vec3 right = glm::normalize(glm::cross(this->front, this->worldUp));
     right.y = 0.0f;
     front.y = 0.0f;
-    // std::cout<<" front: "<<front.x<<" "<<front.y<<" "<<front.z;
-    // std::cout<<" right: "<<right.x<<" "<<right.y<<" "<<right.z<<std::endl;
-    // std::cout<<"x:"<<glm::sin(qt.x)<<" y:"<<glm::cos(qt.y)<<" yaw:"<<yaw<<std::endl;
 
     glm::vec3 positionTemp = this->position;
 
@@ -85,8 +80,8 @@ void Camera::processKeyboard(direction direction, float deltaTime) {
     if(!this->isCollision(positionTemp)) {
         this->position = positionTemp;
     }
-
-    // std::cout<<"position: "<<this->position.x<<" "<<this->position.y<<" "<<this->position.z<<std::endl;
+    std::cout<<"deltaTime: "<<deltaTime<<std::endl;
+    std::cout<<"position: "<<this->position.x<<" "<<this->position.y<<" "<<this->position.z<<std::endl;
     
 }
 

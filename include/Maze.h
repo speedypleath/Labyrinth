@@ -1,4 +1,12 @@
 #pragma once
+
+enum WALL {
+    GATE,
+    HORIZONTAL,
+    VERTICAL,
+    CORNER,
+    CUBE
+};
 class Maze
 {
 private:
@@ -7,7 +15,7 @@ private:
     int **visited;
     int **verticalWalls;
     int **horizontalWalls;
-    char **maze;
+    WALL **maze;
     int gate;
 
 public:
@@ -15,10 +23,7 @@ public:
     ~Maze();
     void generate(int x, int y);
     int adjency(int dir[], int x, int y);
-    int countBlocks();
-    int **getVerticalWalls() const { return verticalWalls; }
-    int **getHorizontalWalls() const { return horizontalWalls; }
-    char **getMaze() const { return maze; }
+    WALL **getMaze() const { return maze; }; 
     void create();
     void print();
 };

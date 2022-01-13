@@ -4,8 +4,7 @@
 #include <iostream>
 #include <Maze.h>
 
-enum
-{
+enum {
     North,
     East,
     South,
@@ -13,16 +12,15 @@ enum
     NDir
 };
 
-
 Maze::Maze(int width)
 {
-    this->gate = rand() % (width - 2) + 1;
+    this->gate = rand() % width - 2;
     srand(time(NULL));
     this->width = width;
     visited = new int *[width];
     verticalWalls = new int *[width];
     horizontalWalls = new int *[width];
-    maze = new char *[width + 1];
+    maze = new WALL *[width + 2];
     for (int i = 0; i < width; i++)
     {
         visited[i] = new int[width];
@@ -34,9 +32,9 @@ Maze::Maze(int width)
         }
     }
 
-    for (int i = 0; i < width + 1; i++)
+    for (int i = 0; i < width + 2; i++)
     {
-        maze[i] = new char[2 * width + 1];
+        maze[i] = new WALL[width + 2];
     }
 }
 
@@ -48,7 +46,7 @@ Maze::~Maze()
         delete[] verticalWalls[i];
         delete[] horizontalWalls[i];
     }
-    for (int i = 0; i < width + 1; i++)
+    for (int i = 0; i < width + 2; i++)
     {
         delete[] maze[i];
     }
@@ -56,15 +54,6 @@ Maze::~Maze()
     delete[] visited;
     delete[] verticalWalls;
     delete[] horizontalWalls;
-}
-
-int Maze::countBlocks(){
-    int count = 0;
-    for(int i = 0; i < width + 1; i++)
-        for(int j = 0; j < 2 * width + 1; j++)
-            if(maze[i][j] == '_' || maze[i][j] == '|')
-                count++;
-    return count;
 }
 
 
@@ -122,58 +111,97 @@ void Maze::generate(int x, int y)
 
 void Maze::create()
 {
+    int k = 0, n = width + 2;
+
+    maze[k / n][k++ % n] = HORIZONTAL;
+
+    for (int i = 0; i < width; i++)
+    {
+        if(i == gate)
+            maze[k / n][k++ % n] = GATE;   
+        else
+            maze[k / n][k++ % n] = VERTICAL;
+    }
+
+    maze[k / n][k++ % n] = CORNER;
+
+    for (int i = 0; i < width; i++) {
+        maze[k / n][k++ % n] = HORIZONTAL;
+        for (int j = 0; j < width; j++) {
+            std :: cout << "i = " << i << " j = " << j << " k = " << k << " val:" << maze[(k-1) / n][ (k-1) % n ]<<std :: endl;
+            if (horizontalWalls[i][j] == 1) {
+                maze[k / n][k++ % n] = HORIZONTAL;
+                continue;
+            }
+            if (verticalWalls[i][j] == 1) {
+                maze[k / n][k++ % n] = VERTICAL;
+                continue;
+            }
+            if (verticalWalls[i][j] == 1 && horizontalWalls[i][j] == 1) {
+                maze[k / n][k++ % n] = CORNER;
+                continue;
+            }
+            maze[k / n][k++ % n] = GATE;
+        }
+        maze[k / n][k++ % n] = HORIZONTAL;
+    }
+
+    maze[k / n][k++ % n] = CUBE;
+
+    for (int i = 0; i < width; i++)
+    {
+        maze[k / n][k++ % n] = VERTICAL;
+    }
+
+    maze[k / n][k++ % n] = VERTICAL;
+    
+}
+
+void Maze::print(){
     int i, j, k = 0, n = 2 * width + 1;
 
-    this->maze[k / n][k++ % n] = '_';
+    std :: cout << '_';
 
     for (i = 0; i < width; i++)
     {
         if(i == gate){
-            this->maze[k / n][k++ % n] = ' ';
-            this->maze[k / n][k++ % n] = ' ';
+            std :: cout << ' ';
+            std :: cout << ' ';
         }
         else{
-            this->maze[k / n][k++ % n] = '_';
-            this->maze[k / n][k++ % n] = '_';
+            std :: cout << '_';
+            std :: cout << '_';
         }
     }
-    
+    std :: cout << '\n';
     for (i = 0; i < width - 1; i++)
     {
-        this->maze[k / n][k++ % n] = '|';
+        std :: cout << '|';
 
         for (j = 0; j < width; j++)
         {
             if(i < width - 1 && verticalWalls[i][j])
-                this->maze[k / n][k++ % n] = ' ';
+                std :: cout << ' ';
             else
-                this->maze[k / n][k++ % n] = '_';
+                std :: cout << '_';
             
             if(j < width - 1 && horizontalWalls[i][j])
-                this->maze[k / n][k++ % n] = ' ';
+                std :: cout << ' ';
             else 
-                this->maze[k / n][k++ % n] = '|';
+                std :: cout << '|';
         }
+        std :: cout << '\n';
     }
 
-    this->maze[k / n][k++ % n] = '|';
+    std :: cout << '|';
 
     for (i = 0; i < width - 1; i++)
     {
-        this->maze[k / n][k++ % n] = '_';
-        this->maze[k / n][k++ % n] = '_';
+        std :: cout << '_';
+        std :: cout << '_';
     }
 
-    this->maze[k / n][k++ % n] = '_';
-    this->maze[k / n][k++ % n] = '|';
-
-}
-
-void Maze::print(){
-    for(int i = 0; i < width + 1; i++){
-        for(int j = 0; j < 2 * width + 1; j++){
-            std::cout << maze[i][j];
-        }
-        std::cout << std::endl;
-    }
+    std :: cout << '_';
+    std :: cout << '|';
+    std :: cout << '\n';
 }

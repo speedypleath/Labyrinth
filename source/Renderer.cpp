@@ -26,7 +26,7 @@ Renderer::~Renderer(){
     delete this->ebo;
 }
 
-void Renderer::instance(int **map, int x, int y, glm::mat4 transform){
+void Renderer::instance(int **map, int x, int y, int distance, glm::mat4 transform){
 
     this->instanceCount = 0;
     for(int i = 0; i < x; i++)
@@ -52,7 +52,7 @@ void Renderer::instance(int **map, int x, int y, glm::mat4 transform){
     for(int i = 0; i < x; i++)
         for(int j = 0; j < y; j++)
             if(map[i][j] == 1)
-                MatModel[k++] = glm::translate(glm::mat4(1.0f), glm::vec3(i * 200.0f, 0.0f, j * 200.0f)) * transform;
+                MatModel[k++] = glm::translate(glm::mat4(1.0f), glm::vec3(distance * i, 0.0f, distance * j)) * transform;
 
     instanceVBO = new VBO(MatModel, sizeof(MatModel));
     colorVBO = new VBO(Colors, sizeof(Colors));
@@ -61,11 +61,14 @@ void Renderer::instance(int **map, int x, int y, glm::mat4 transform){
 }
 
 void Renderer::draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix){
-    shader->bind();
-    shader->setMat4("projection", projectionMatrix);
-    shader->setMat4("view", viewMatrix);
-    shader->setMat4("model", glm::mat4(1.0f));
     vao->bind();
+    vbo->bind();
+    ebo->bind();
+    int codCol = 0;
+    shader->bind();
+    shader->setInt("codCol", codCol);
+    shader->setMat4("viewMatrix", viewMatrix);
+    shader->setMat4("projectionMatrix", projectionMatrix);
     glDrawElements(GL_TRIANGLES, ebo->getCount(), GL_UNSIGNED_INT, 0);
     vao->unbind();
 }

@@ -22,7 +22,7 @@ public:
     Renderer(GLfloat *vertices, GLuint *indices, int verticesSize, int indicesSize);
     Renderer(VAO *vao, VBO *vbo, EBO *ebo, Shader *shader);
     ~Renderer();
-    void instance(int **map, int x, int y, glm::mat4 transform);
+    void instance(int **map, int x, int y, int distance, glm::mat4 transform);
     void draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix);
     void drawInstanced(glm::mat4 viewMatrix, glm::mat4 projectionMatrix);
 };
