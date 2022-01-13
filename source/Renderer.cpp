@@ -34,29 +34,34 @@ void Renderer::instance(int **map, int x, int y, int distance, glm::mat4 transfo
             if(map[i][j])
                 this->instanceCount++;
     
-    glm::vec4 Colors[instanceCount];
+    glm::vec4 colors[instanceCount];
+    glm::vec2 texture[instanceCount];
+	glm::mat4 matModel[this->instanceCount];
+
 	for (int n = 0; n < instanceCount; n++)
 	{
 		float a = float(n) / 4.0f;
 		float b = float(n) / 5.0f;
 		float c = float(n) / 6.0f;
-		Colors[n][0] = 0.35f + 0.30f * (sinf(a + 2.0f) + 1.0f);
-		Colors[n][1] = 0.25f + 0.25f * (sinf(b + 3.0f) + 1.0f);
-		Colors[n][2] = 0.25f + 0.35f * (sinf(c + 4.0f) + 1.0f);
-		Colors[n][3] = 1.0f;
+		colors[n][0] = 0.35f + 0.30f * (sinf(a + 2.0f) + 1.0f);
+		colors[n][1] = 0.25f + 0.25f * (sinf(b + 3.0f) + 1.0f);
+		colors[n][2] = 0.25f + 0.35f * (sinf(c + 4.0f) + 1.0f);
+		colors[n][3] = 1.0f;
 	}
-
-	glm::mat4 MatModel[this->instanceCount];
 
     int k = 0;
     for(int i = 0; i < x; i++)
         for(int j = 0; j < y; j++)
-            if(map[i][j] == 1)
-                MatModel[k++] = glm::translate(glm::mat4(1.0f), glm::vec3(distance * i, 0.0f, distance * j)) * transform;
+            if(map[i][j] == 1){
+                texture[k] = glm::vec2(distance * i, distance * j);
+                matModel[k++] = glm::translate(glm::mat4(1.0f), glm::vec3(distance * i, 0.0f, distance * j)) * transform;
+        }
 
-    instanceVBO = new VBO(MatModel, sizeof(MatModel));
-    colorVBO = new VBO(Colors, sizeof(Colors));
+    instanceVBO = new VBO(matModel, sizeof(matModel));
+    colorVBO = new VBO(colors, sizeof(colors));
+    textureVBO = new VBO(texture, sizeof(texture));
     vao->addBufferVec4(*colorVBO, true);
+    vao->addBufferVec2(*textureVBO);
     vao->addBufferMat4(*instanceVBO);
 }
 
@@ -73,14 +78,15 @@ void Renderer::draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix){
     vao->unbind();
 }
 
-void Renderer::drawInstanced(glm::mat4 viewMatrix, glm::mat4 projectionMatrix){
+void Renderer::drawInstanced(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, int codCol){
     vao->bind();
     vbo->bind();
     colorVBO->bind();
     instanceVBO->bind();
     ebo->bind();
-    int codCol = 0;
     shader->bind();
+    int texture = 0;
+    shader->setInt("tex_Unit", texture);
     shader->setInt("codCol", codCol);
     shader->setMat4("viewMatrix", viewMatrix);
     shader->setMat4("projectionMatrix", projectionMatrix);

@@ -6,6 +6,7 @@
 #include <Camera.h>
 #include <Maze.h>
 #include <Renderer.h>
+#include <Texture.h>
 #include <errorHandle.h>
 #include "glm/glm.hpp"  
 #include "glm/gtc/matrix_transform.hpp"
@@ -21,6 +22,7 @@ private:
     glm::mat4 projectionMatrix;
     glm::mat4 viewMatrix;
     glm::mat4 modelMatrix;
+    Texture *texture;
     Renderer *verticalWallRenderer;
     Renderer *horizontalWallRenderer;
     Renderer *floorRenderer;

@@ -13,6 +13,7 @@ private:
     VBO *vbo;
     VBO *colorVBO;
     VBO *instanceVBO;
+    VBO *textureVBO;
     EBO *ebo;
     Shader *shader;
     int instanceCount;
@@ -24,7 +25,7 @@ public:
     ~Renderer();
     void instance(int **map, int x, int y, int distance, glm::mat4 transform);
     void draw(glm::mat4 viewMatrix, glm::mat4 projectionMatrix);
-    void drawInstanced(glm::mat4 viewMatrix, glm::mat4 projectionMatrix);
+    void drawInstanced(glm::mat4 viewMatrix, glm::mat4 projectionMatrix, int codCol);
 };
 
         

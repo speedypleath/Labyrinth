@@ -14,6 +14,7 @@ public:
     void setInt(const char *name, int value) const;
     void setFloat(const char *name, float value) const;
     void setMat4(const char *name, glm::mat4 value) const;
+    void setVec2(const char *name, glm::vec2 value) const;
     void bind() const;
     void unbind() const;
 };

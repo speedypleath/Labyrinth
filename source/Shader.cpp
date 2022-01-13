@@ -9,6 +9,8 @@
 #include <errorHandle.h>
 #include <OpenGL/gl.h>
 
+#include <stb_image.h>
+
 std::string Shader::readFile(const char *filePath) {
     std::string content;
     std::ifstream fileStream(filePath, std::ios::in);
@@ -111,6 +113,10 @@ void Shader::setInt(const char *name, int value) const {
 void Shader::setFloat(const char *name, float value) const {
     unsigned int location = glGetUniformLocation(program, name);
     GLCall(glUniform1f(location, value));
+}
+void Shader::setVec2(const char *name, glm::vec2 value) const {
+    unsigned int location = glGetUniformLocation(program, name);
+    GLCall(glUniform2fv(location, GL_FALSE, &value[0]));
 }
 void Shader::setMat4(const char *name, glm::mat4 value) const {
     unsigned int location = glGetUniformLocation(program, name);

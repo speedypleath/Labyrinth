@@ -1,15 +1,18 @@
 #version 410
 
 in vec4 ex_Color;
-uniform int codCol;
- 
+in vec2 tex_Coord;
 out vec4 out_Color;
 
+uniform int codCol;
+uniform sampler2D tex_Unit;
+
 void main(void)
-  {
-    switch (codCol)
-    {
-        case 1: out_Color=vec4(1.0, 1.0, 1.0,0.0); break;
-        default: out_Color=ex_Color;
-    }
+{
+  if(codCol == 0) {
+    out_Color = ex_Color;
   }
+  else {
+    out_Color = texture(tex_Unit, tex_Coord);
+  }
+}

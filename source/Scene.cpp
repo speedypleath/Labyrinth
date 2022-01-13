@@ -80,13 +80,15 @@ void Scene::init(void)
     maze = new Maze(mazeSize);
     maze->generate(0, 0);
     mazeSize += 2;
-    floorSize = mazeSize * 2 + padding * 2;
     maze->create();
     maze->print();
     WALL **mazeArray = maze->getMaze();
-    int **corners, **horizontalWalls, **verticalWalls, **cubes, **floor, **collisionMatrix;
+    int **corners, **horizontalWalls, **verticalWalls, **cubes, **floorArray, **collisionMatrix;
 
-    floor = new int*[floorSize];
+    floorArray = new int*[1];
+    floorArray[0] = new int[1];
+    floorArray[0][0] = 1;
+
     corners = new int*[mazeSize];
     horizontalWalls = new int*[mazeSize];
     verticalWalls = new int*[mazeSize];
@@ -94,9 +96,6 @@ void Scene::init(void)
     cubes = new int*[mazeSize];
     for (int i = 0; i < 2 * mazeSize ; i++) {
         collisionMatrix[i] = new int[2 * mazeSize];
-    }
-    for (int i = 0; i <floorSize; i++) {
-        floor[i] = new int[mazeSize + 2 * padding];
     }
     for (int i = 0; i < mazeSize; i++) {
         corners[i] = new int[mazeSize];
@@ -108,12 +107,6 @@ void Scene::init(void)
     for (int i = 0; i < 2 * mazeSize ; i++)
         for (int j = 0; j < 2 * mazeSize ; j++)
             collisionMatrix[i][j] = 0;
-
-    for (int i = 0; i <floorSize; i++) {
-        for (int j = 0; j <floorSize; j++) {
-            floor[i][j] = 1;
-        }
-    }
 
     for(int i = 0; i < mazeSize; i++) {
         for(int j = 0; j < mazeSize; j++) {
@@ -162,8 +155,8 @@ void Scene::init(void)
 
     // print collision matrix
     std :: cout << "\n\nCollision Matrix:" << std :: endl;
-    for(int i = 0; i < 2 * mazeSize - 1; i++) {
-        for(int j = 0; j < 2 * mazeSize - 1; j++) {
+    for(int i = 0; i < 2 * mazeSize; i++) {
+        for(int j = 0; j < 2 * mazeSize; j++) {
             std :: cout << collisionMatrix[i][j] << ' ';
         }
         std :: cout << std :: endl;
@@ -234,7 +227,7 @@ void Scene::init(void)
         0.0f,  1.0f, 1.0f, 1.0f, // 7
     };
 
-    GLfloat tile[] = 
+    GLfloat floor[] = 
     {
         0.0f,  -0.25f, 0.0f, 1.0f,
         1.0f,  -0.25f, 0.0f, 1.0f,
@@ -274,12 +267,14 @@ void Scene::init(void)
         8, 9, 11,   11, 9, 12,
         11, 12, 10,   10, 12, 13, 
 	};
+
+
     camera = new Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     projectionMatrix = glm::infinitePerspective(PI / 2.0f, (float) glutGet(GLUT_WINDOW_WIDTH) / glutGet(GLUT_WINDOW_HEIGHT), 0.01f);
 
     glm::mat4 scaledMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 1.0f, 2.0f)) * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, 0.0f));
-    floorRenderer = new Renderer(tile, wallIndices, sizeof(tile), sizeof(wallIndices) / sizeof(GLuint));
-    floorRenderer->instance(floor,floorSize, floorSize, 1, glm::translate(glm::mat4(1.0f), glm::vec3(-padding, -0.5f, -padding)));
+    floorRenderer = new Renderer(floor, wallIndices, sizeof(floor), sizeof(wallIndices) / sizeof(GLuint));
+    floorRenderer->instance(floorArray, 1, 1, 0, glm::translate(glm::mat4(1.0f), glm::vec3(-padding, -0.5f, -padding)) * scale(glm::mat4(1.0f), glm::vec3(200.0f, 1.0f, 200.0f)));
     cubeRenderer = new Renderer(cube, wallIndices, sizeof(cube), sizeof(wallIndices) / sizeof(GLuint));
     cubeRenderer->instance(cubes, mazeSize, mazeSize, 2, glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, 0.0f)));
     cornerRenderer = new Renderer(corner, cornerIndices, sizeof(corner), sizeof(cornerIndices) / sizeof(GLuint));
@@ -293,11 +288,10 @@ void Scene::init(void)
     horizontalWallRenderer = new Renderer(wall, wallIndices, sizeof(wall), sizeof(wallIndices) / sizeof(GLuint));
     horizontalWallRenderer->instance(horizontalWalls, mazeSize, mazeSize, 2, scaledMatrix);
 
+    texture = new Texture("resource/texture.jpg");
+
     for (int i = 0; i < 2 * mazeSize ; i++) {
         delete collisionMatrix[i];
-    }
-    for (int i = 0; i <floorSize; i++) {
-        delete floor[i];
     }
     for (int i = 0; i < mazeSize; i++) {
         delete corners[i];
@@ -305,30 +299,32 @@ void Scene::init(void)
         delete verticalWalls[i];
         delete cubes[i];
     }
+    delete floorArray[0];
 
     delete corners;
     delete horizontalWalls;
     delete verticalWalls;
     delete cubes;
-    delete floor;
+    delete floorArray;
     delete collisionMatrix;
 }
 
 // render the program
 void Scene::render(void)
 {  
-    
+    texture->bind();
+
     GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 	GLCall(glEnable(GL_DEPTH_TEST));
     GLCall(glEnable(GL_BLEND));
     GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
     viewMatrix = camera->getViewMatrix();
 
-    floorRenderer->drawInstanced(viewMatrix, projectionMatrix);
-    cubeRenderer->draw(viewMatrix, projectionMatrix);
-    cornerRenderer->draw(viewMatrix, projectionMatrix);
-    verticalWallRenderer->drawInstanced(viewMatrix, projectionMatrix);
-    horizontalWallRenderer->drawInstanced(viewMatrix, projectionMatrix);
+    floorRenderer->drawInstanced(viewMatrix, projectionMatrix, 0);
+    cubeRenderer->drawInstanced(viewMatrix, projectionMatrix, 0);
+    cornerRenderer->drawInstanced(viewMatrix, projectionMatrix, 0);
+    verticalWallRenderer->drawInstanced(viewMatrix, projectionMatrix, 1);
+    horizontalWallRenderer->drawInstanced(viewMatrix, projectionMatrix, 1);
 
     GLCall(glutSwapBuffers());
     GLCall(glFlush());

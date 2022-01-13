@@ -24,6 +24,13 @@ void VAO::bind(){
 void VAO::unbind(){
     GLCall(glBindVertexArray(0));
 }
+void VAO::addBufferVec2(VBO& vbo){
+    bind();
+    vbo.bind();
+    GLCall(glEnableVertexAttribArray(atribCount));
+    GLCall(glVertexAttribPointer(atribCount, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0));
+    atribCount++;
+}
 void VAO::addBufferVec4(VBO& vbo, bool withDivisor){
     vbo.bind();
 
