@@ -36,7 +36,7 @@ void Renderer::instance(int **map, int x, int y, int distance, glm::mat4 transfo
     
     glm::vec4 colors[instanceCount];
     glm::vec2 texture[instanceCount];
-	glm::mat4 matModel[this->instanceCount];
+	glm::mat4 matModel[instanceCount];
 
 	for (int n = 0; n < instanceCount; n++)
 	{
@@ -50,10 +50,18 @@ void Renderer::instance(int **map, int x, int y, int distance, glm::mat4 transfo
 	}
 
     int k = 0;
+    texture[0] = glm::vec3(1.0f, 1.0f, 0.0f);
+    texture[1] = glm::vec3(0.0f, 1.0f, 0.0f);
+    texture[2] = glm::vec3(0.0f, 0.0f, 0.0f);
+    texture[3] = glm::vec3(1.0f, 0.0f, 0.0f);
+    texture[4] = glm::vec3(0.0f, 0.0f, 0.0f);
+    texture[5] = glm::vec3(1.0f, 0.0f, 0.0f);
+    texture[6] = glm::vec3(1.0f, 1.0f, 0.0f);
+    texture[7] = glm::vec3(0.0f, 1.0f, 0.0f);
+
     for(int i = 0; i < x; i++)
         for(int j = 0; j < y; j++)
             if(map[i][j] == 1){
-                texture[k] = glm::vec2(distance * i, distance * j);
                 matModel[k++] = glm::translate(glm::mat4(1.0f), glm::vec3(distance * i, 0.0f, distance * j)) * transform;
         }
 

@@ -269,6 +269,7 @@ void Scene::init(void)
 	};
 
 
+    skybox = new Skybox();
     camera = new Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     projectionMatrix = glm::infinitePerspective(PI / 2.0f, (float) glutGet(GLUT_WINDOW_WIDTH) / glutGet(GLUT_WINDOW_HEIGHT), 0.01f);
 
@@ -288,7 +289,7 @@ void Scene::init(void)
     horizontalWallRenderer = new Renderer(wall, wallIndices, sizeof(wall), sizeof(wallIndices) / sizeof(GLuint));
     horizontalWallRenderer->instance(horizontalWalls, mazeSize, mazeSize, 2, scaledMatrix);
 
-    texture = new Texture("resource/texture.jpg");
+    texture = new Texture("resource/graffiti.jpg");
 
     for (int i = 0; i < 2 * mazeSize ; i++) {
         delete collisionMatrix[i];
@@ -312,20 +313,22 @@ void Scene::init(void)
 // render the program
 void Scene::render(void)
 {  
+    GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+    viewMatrix = camera->getViewMatrix();
+    skybox->draw(viewMatrix, projectionMatrix);
     texture->bind();
 
-    GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 	GLCall(glEnable(GL_DEPTH_TEST));
     GLCall(glEnable(GL_BLEND));
     GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-    viewMatrix = camera->getViewMatrix();
 
-    floorRenderer->drawInstanced(viewMatrix, projectionMatrix, 0);
-    cubeRenderer->drawInstanced(viewMatrix, projectionMatrix, 0);
-    cornerRenderer->drawInstanced(viewMatrix, projectionMatrix, 0);
+    floorRenderer->drawInstanced(viewMatrix, projectionMatrix, 1);
+    cubeRenderer->drawInstanced(viewMatrix, projectionMatrix, 1);
+    cornerRenderer->drawInstanced(viewMatrix, projectionMatrix, 1);
     verticalWallRenderer->drawInstanced(viewMatrix, projectionMatrix, 1);
     horizontalWallRenderer->drawInstanced(viewMatrix, projectionMatrix, 1);
 
+    GLCall(glDisable(GL_BLEND));
     GLCall(glutSwapBuffers());
     GLCall(glFlush());
 
@@ -394,4 +397,7 @@ void Scene::cleanup(void)
     delete horizontalWallRenderer;
     delete cornerRenderer;
     delete cubeRenderer;
+    delete floorRenderer;
+    delete texture;
+    delete skybox;
 }

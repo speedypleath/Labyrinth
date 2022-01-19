@@ -8,6 +8,7 @@
 #include <Renderer.h>
 #include <Texture.h>
 #include <errorHandle.h>
+#include <Skybox.h>
 #include "glm/glm.hpp"  
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
@@ -17,6 +18,7 @@
 class Scene {
 private:
     Camera *camera;
+    Skybox *skybox;
     static Scene *instance;
     Maze *maze;
     glm::mat4 projectionMatrix;

@@ -14,4 +14,5 @@ public:
     void addBufferVec4(VBO& vbo, bool withDivisor);
     void addBufferMat4(VBO& vbo);
     void addBufferVec2(VBO& vbo);
+    void addBufferVec3(VBO& vbo);
 };
